@@ -20,7 +20,7 @@ def build_b(gX, gY):
     return vec_b
 
 
-def solve_g(gX, gY):
+def solve_compatibility(gX, gY):
     M, N = gX.shape
     vec_b = build_b(gX, gY)
 

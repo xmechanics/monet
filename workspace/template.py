@@ -13,7 +13,7 @@ prj_root = os.path.dirname(workspace)
 sys.path.insert(0, prj_root)
 
 from monet.io import read_h5
-from monet.solve import solve_g, reconstruct
+from monet.reconstruct import solve_compatibility, reconstruct
 
 def reconstruct_frm(frm):
         init_logging()
@@ -22,7 +22,7 @@ def reconstruct_frm(frm):
         z_h5 = os.path.join(z_dir, "z_%03d.h5" % frm)
         if not os.path.exists(z_h5):
             gX, gY = read_h5(grad_h5)
-            gX, gY = solve_g(gX, gY)
+            gX, gY = solve_compatibility(gX, gY)
             Z = reconstruct(gX, gY)
             with h5py.File(z_h5, 'w') as h5:
                 h5.create_dataset("z", data=Z)
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     z_dir = os.path.join(data_root, "z")
 
     if not os.path.exists(z_dir):
-        os.makedirs(z_dir)
+        os.makedirs(z_dir, exist_ok=True)
 
     Parallel(n_jobs=4)(delayed(reconstruct_frm)(frm) for frm in range(375))
 
