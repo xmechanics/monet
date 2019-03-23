@@ -10,16 +10,6 @@ from joblib import Parallel, delayed
 _logger = logging.getLogger(__name__)
 
 
-@numba.jit(nopython=True)
-def uij(i, j, M, N):
-    return i * M + j
-
-
-@numba.jit(nopython=True)
-def vij(i, j, M, N):
-    return uij(i, j, M, N) + (M * N)
-
-
 def build_A(M, N):
     """
     build complete A matrix:
@@ -82,20 +72,31 @@ def build_quadruple_data(i, j, M, N):
     return rows, cols, and data for one compatibility equation:
     u_i,j + v_i+1,j - u_i,j+1 - v_i,j == 0
     """
+    #TODO: explore other compatibility conditions
     u1 = uij(i, j, M, N)
-    u2 = uij(i + 1, j, M, N)
+    # u2 = uij(i + 1, j, M, N)
     u3 = uij(i, j + 1, M, N)
-    u4 = uij(i + 1, j + 1, M, N)
+    # u4 = uij(i + 1, j + 1, M, N)
     v1 = vij(i, j, M, N)
     v2 = vij(i + 1, j, M, N)
-    v3 = vij(i, j + 1, M, N)
-    v4 = vij(i + 1, j + 1, M, N)
+    # v3 = vij(i, j + 1, M, N)
+    # v4 = vij(i + 1, j + 1, M, N)
 
     row = [0] * 4
     col = [u1, v2, u3, v1]
     data = [1, 1, -1, -1]
 
     return row, col, data
+
+
+@numba.jit(nopython=True)
+def uij(i, j, M, N):
+    return i * M + j
+
+
+@numba.jit(nopython=True)
+def vij(i, j, M, N):
+    return uij(i, j, M, N) + (M * N)
 
 
 if __name__ == "__main__":
