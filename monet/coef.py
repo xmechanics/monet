@@ -74,13 +74,13 @@ def build_E_i(I, M, N):
 def build_quadruple(i, j, M, N):
     row, col, data = build_quadruple_data(i, j, M, N)
     return sparse.coo_matrix((data, (row, col)), shape=(1, 2 * M * N), dtype=np.int16)
-    # return sparse.coo_matrix((data, (row, col)), shape=(3, 2 * M * N), dtype=np.int16)
 
 
 @numba.jit(nopython=True)
 def build_quadruple_data(i, j, M, N):
     """
     return rows, cols, and data for one compatibility equation:
+    u_i,j + v_i+1,j - u_i,j+1 - v_i,j == 0
     """
     u1 = uij(i, j, M, N)
     u2 = uij(i + 1, j, M, N)
