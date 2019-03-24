@@ -49,14 +49,12 @@ def reconstruct(gX, gY):
 
 
 def reconstruct_t(gX, gY):
-    # left line
+    """Reconstruct by a different integration path"""
+    # switch X and Y
     gX, gY = gY.transpose(), gX.transpose()
-    M = gX.shape[0]
-    N = gY.shape[1]
-    z0 = np.hstack([np.zeros(1), gY[0, :].cumsum()])
-    Z0 = np.vstack([z0] * gY.shape[1])[:, :N]
-    A = np.vstack([np.zeros((1, gX.shape[1])), gX.cumsum(axis=0)])[:M, :]
-    Z = A + Z0
+    # normal reconstruct
+    Z = reconstruct(gX, gY)
+    # switch back X and Y
     return Z.transpose()
 
 
