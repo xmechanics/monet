@@ -5,7 +5,7 @@ Dual Bean DInC
 ## Setup Environment
 
 Install Anaconda, or Miniconda.
-Use `conda.yml` file to create the conda env for this project.
+Use `conda.yaml` file to create the conda env for this project.
 Run following command under project root:
    
     conda create -f conda.yaml
