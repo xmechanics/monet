@@ -8,7 +8,7 @@ Install Anaconda, or Miniconda.
 Use `conda.yaml` file to create the conda env for this project.
 Run following command under project root:
    
-    conda create -f conda.yaml
+    conda env create -f conda.yaml
 
 Then activate the conda env `monet`, to run scripts:
 
