@@ -1,6 +1,6 @@
 # monet
 
-Dual Bean DInC
+Dual Beam-shear DInC
 
 ## Setup Environment
 
