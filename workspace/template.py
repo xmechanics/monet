@@ -16,24 +16,7 @@ from monet.io import read_h5
 from monet.reconstruct import solve_compatibility, reconstruct
 
 
-def flatten_frm(z_dir, z_flat_dir, frm, gX_bg, gY_bg):
-        init_logging()
-        t0 = time.time()
-        z_h5 = os.path.join(z_dir, "z_%03d.h5" % frm)
-        z_flat_h5 = os.path.join(z_flat_dir, "z_flat_%03d.h5" % frm)
-        if not os.path.exists(z_flat_h5):
-            gX, gY = read_h5(z_h5, gx_ds="gx", gy_ds="gy")
-            gX -= gX_bg
-            gY -= gY_bg
-            Z = reconstruct(gX, gY)
-            with h5py.File(z_flat_h5, 'w') as h5:
-                h5.create_dataset("z", data=Z)
-                h5.create_dataset("gx", data=gX)
-                h5.create_dataset("gy", data=gY)
-        _logger.info("Flattened frame %d using %.2f sec" % (frm, time.time() - t0))
-
-
-def reconstruct_frm(frm):
+def reconstruct_frm(grad_dir, z_dir, frm):
     init_logging()
     t0 = time.time()
     grad_h5 = os.path.join(grad_dir, "gradz%04d.h5" % frm)
@@ -49,11 +32,29 @@ def reconstruct_frm(frm):
     _logger.info("Reconstructed frame %d using %.2f sec" % (frm, time.time() - t0))
 
 
+def flatten_frm(z_dir, z_flat_dir, frm, gX_bg, gY_bg):
+    init_logging()
+    t0 = time.time()
+    z_h5 = os.path.join(z_dir, "z_%03d.h5" % frm)
+    z_flat_h5 = os.path.join(z_flat_dir, "z_flat_%03d.h5" % frm)
+    if not os.path.exists(z_flat_h5):
+        gX, gY = read_h5(z_h5, gx_ds="gx", gy_ds="gy")
+        gX -= gX_bg
+        gY -= gY_bg
+        Z = reconstruct(gX, gY)
+        with h5py.File(z_flat_h5, 'w') as h5:
+            h5.create_dataset("z", data=Z)
+            h5.create_dataset("gx", data=gX)
+            h5.create_dataset("gy", data=gY)
+    _logger.info("Flattened frame %d using %.2f sec" % (frm, time.time() - t0))
+
+
 if __name__ == "__main__":
     from monet import init_logging
+
     init_logging()
 
-    data_root = os.path.join(workspace, "data", "NiTi_Strain3E1_cyc3")
+    data_root = os.path.join(workspace, "data", "microribbon")
     grad_dir = os.path.join(data_root, "grad")
     n_files = len([name for name in os.listdir(grad_dir) if name.endswith(".h5")])
     _logger.info("Found %d gradient files in %s" % (n_files, grad_dir))
@@ -65,7 +66,7 @@ if __name__ == "__main__":
 
     if not os.path.exists(z_dir):
         os.makedirs(z_dir, exist_ok=True)
-    
+
     Parallel(n_jobs=4)(delayed(reconstruct_frm)(grad_dir, z_dir, frm) for frm in range(250))
 
     # =====
@@ -82,4 +83,3 @@ if __name__ == "__main__":
         os.makedirs(z_flat_dir, exist_ok=True)
 
     Parallel(n_jobs=4)(delayed(flatten_frm)(z_dir, z_flat_dir, frm, gX_bg, gY_bg) for frm in range(n_files))
-
