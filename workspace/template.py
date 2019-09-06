@@ -107,10 +107,11 @@ if __name__ == "__main__":
 
     # use flatten gradients?
     use_flatten = True
-    z_prefix = "z_flat" if use_flatten else "z"
-
     # pick frame range for video
     rng = range(30, 150)
     # rng = range(n_files)
 
-    Parallel(n_jobs=4)(delayed(frm_to_xdmf)(z_dir, z_prefix, xdmf_dir, frm) for frm in rng)
+    if use_flatten:
+        Parallel(n_jobs=4)(delayed(frm_to_xdmf)(z_flat_dir, "z_flat", xdmf_dir, frm) for frm in rng)
+    else:
+        Parallel(n_jobs=4)(delayed(frm_to_xdmf)(z_dir, "z", xdmf_dir, frm) for frm in rng)
