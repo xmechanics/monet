@@ -109,12 +109,16 @@ if __name__ == "__main__":
     init_logging()
 
     data_dir = os.path.join(prj_root, "data")
-    npz_file = os.path.join(data_dir, "A.npz")
 
     M = 1000
     N = 1000
     mat_A = build_A(M, N)
+
+    npz_file = os.path.join(data_dir, "A.npz")
     sparse.save_npz(npz_file, mat_A)
 
     print(mat_A.shape, mat_A.dtype)
+
+    print("You can rename and check in the generated coefficient matrix file for M=%d N=%d!" % (M, N))
+    print(npz_file)
 
