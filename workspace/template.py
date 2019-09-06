@@ -92,7 +92,6 @@ if __name__ == "__main__":
     if not os.path.exists(z_flat_dir):
         os.makedirs(z_flat_dir, exist_ok=True)
 
-    n_files = len([name for name in os.listdir(z_dir) if name.endswith(".h5")])
     Parallel(n_jobs=4)(delayed(flatten_frm)(z_dir, z_flat_dir, frm, gX_bg, gY_bg) for frm in range(n_files))
 
     # =====
