@@ -49,12 +49,15 @@ def z_file_to_xdmf(z_file, xdmf_dir, filename):
  <Domain>
    <Grid Name="mesh1" GridType="Uniform">
      <Topology TopologyType="2DSMesh" NumberOfElements="%s"/>
-     <Geometry GeometryType="X_Y">
+     <Geometry GeometryType="X_Y_Z">
        <DataItem Dimensions="%s" NumberType="Float" Precision="4" Format="HDF">
         %s:/X
        </DataItem>
        <DataItem Dimensions="%s" NumberType="Float" Precision="4" Format="HDF">
         %s:/Y
+       </DataItem>
+       <DataItem Dimensions="%s" NumberType="Float" Precision="4" Format="HDF">
+        %s:/Z
        </DataItem>
      </Geometry>
      <Attribute Name="Z" AttributeType="Scalar" Center="Node">
@@ -75,6 +78,6 @@ def z_file_to_xdmf(z_file, xdmf_dir, filename):
    </Grid>
  </Domain>
 </Xdmf>
-            """ % (shape, shape, h5_file_name, shape, h5_file_name,
+            """ % (shape, shape, h5_file_name, shape, h5_file_name, shape, h5_file_name,
                    shape, h5_file_name, shape, h5_file_name, shape, h5_file_name))
     return xdmf_file, h5_file
