@@ -25,8 +25,8 @@ def solve_compatibility(gX, gY):
 
     prj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     npz_file = os.path.join(prj_root, "data", "A_%d_%d.npz" % (M, N))
-    if os.path.exists(npz_file):
-        _logger.warning("No the coefficient matrix for M=%d N=%d, please run coef.py to generate it." % (M, N))
+    if not os.path.exists(npz_file):
+        raise Exception("No the coefficient matrix for M=%d N=%d, please run coef.py to generate it." % (M, N))
     mat_A = sparse.load_npz(npz_file).astype(np.float)
 
     _logger.info("Start solving linear system ...")
