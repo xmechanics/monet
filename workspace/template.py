@@ -75,7 +75,7 @@ if __name__ == "__main__":
     if not os.path.exists(z_dir):
         os.makedirs(z_dir, exist_ok=True)
 
-    Parallel(n_jobs=4)(delayed(reconstruct_frm)(grad_dir, z_dir, frm) for frm in range(250))
+    Parallel(n_jobs=4)(delayed(reconstruct_frm)(grad_dir, z_dir, frm) for frm in range(n_files))
 
     # =====
     # flatten: remove a background gradient field
@@ -92,6 +92,7 @@ if __name__ == "__main__":
     if not os.path.exists(z_flat_dir):
         os.makedirs(z_flat_dir, exist_ok=True)
 
+    n_files = len([name for name in os.listdir(z_dir) if name.endswith(".h5")])
     Parallel(n_jobs=4)(delayed(flatten_frm)(z_dir, z_flat_dir, frm, gX_bg, gY_bg) for frm in range(n_files))
 
     # =====
@@ -112,4 +113,4 @@ if __name__ == "__main__":
     rng = range(30, 150)
     # rng = range(n_files)
 
-    Parallel(n_jobs=4)(delayed(frm_to_xdmf())(z_dir, z_prefix, xdmf_dir, frm) for frm in rng)
+    Parallel(n_jobs=4)(delayed(frm_to_xdmf)(z_dir, z_prefix, xdmf_dir, frm) for frm in rng)
