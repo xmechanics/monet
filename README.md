@@ -15,7 +15,7 @@ Then activate the conda env `monet`, to run scripts:
     conda activate monet
 
 
-If the `conda.yaml` has been changed since you crated the conda environment, you can use the yaml to update it
+If the `conda.yaml` has been changed since you created the conda environment, you can use the yaml to update it
 
     conda update -f conda.yaml
 
