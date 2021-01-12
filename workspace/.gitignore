@@ -1,3 +1,7 @@
 *.py
 
 !template.py
+!evolution_template.py
+
+/data
+/output
