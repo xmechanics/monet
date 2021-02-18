@@ -43,7 +43,7 @@ def reconstruct(gX, gY):
     N = gY.shape[1]
     # left line
     z0 = np.hstack([np.zeros(1), gY[0, :].cumsum()])
-    Z0 = np.vstack([z0] * gY.shape[1])[:, :N]
+    Z0 = np.vstack([z0] * M)[:, :N]
     # going right
     A = np.vstack([np.zeros((1, gX.shape[1])), gX.cumsum(axis=0)])[:M, :]
     return (A + Z0).astype(np.float32)

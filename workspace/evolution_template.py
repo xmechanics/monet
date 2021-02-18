@@ -51,28 +51,51 @@ if __name__ == "__main__":
     # convert folder name to strain rate
     def get_strain_rate(folder):
         r_int = int(folder)
-        return "%.1f%% / sec" % (0.1 * r_int)
+        return "%.1f%%/s" % (0.1 * r_int)
 
     # contraction start, end; expansion start, end
     frame_boundaries = {        
-        "01": [210, 210 + 1250, 1050, 1050 + 1250],
-        "05": [200, 200 + 250, 550, 550 + 250],
-        "10": [230, 230 + 75, 425, 425 + 75],
-        "25": [175, 175 + 50, 440, 440 + 50],
-        "50": [144, 144 + 25, 429, 429 + 25],
-        "60": [213, 213 + 21, 680, 680 + 21]
+        "01": [520, 1150, 950, 750],
+        "05": [250, 510, 305, 200],
+        "10": [225, 390, 225, 100],
+        "15": [177, 385, 160, 67],
+        "20": [240, 470, 215, 50],
+        "25": [183, 435, 155, 40],
+        "30": [126, 300, 95, 33],
+        "35": [202, 468, 165, 28],
+        "40": [123, 360, 90, 25],
+        "45": [183, 433, 145, 22],
+        "50": [150, 425, 115, 20],
+        "55": [137, 388, 100, 18],
+        "60": [218, 678, 180, 16]
     }
 
     frame_ticks = {
-        "01": [0, 250, 500, 750, 1000, 1250],
-        "05": [0, 50, 100, 150, 200, 250],
-        "10": [0, 15, 30, 45, 60, 75],
-        "25": [0, 10, 20, 30, 40, 50],
-        "50": [0, 5, 10, 15, 20, 25],
-        "60": [0, 3, 6, 9, 12, 15, 18, 21],
+        "01": [0, 250, 500, 750, 1000],
+        "05": [0, 50, 100, 150, 200],
+        "10": [0, 20, 40, 60, 80, 100],
+        "15": [0, 15, 30, 45, 60, 67],
+        "20": [0, 10, 20, 30, 40, 50],
+        "25": [0, 10, 20, 30, 40],
+        "30": [0, 10, 20, 30, 33],
+        "35": [0, 7, 14, 21, 28],
+        "40": [0, 5, 10, 15, 20, 25],
+        "45": [0, 5, 10, 15, 22],
+        "50": [0, 5, 10, 15, 20],
+        "55": [0, 6, 12, 18],
+        "60": [0, 4, 8, 12, 16],
     }
 
-    for f in ["01", "05", "10", "25", "50", "60"]:
+    # font = {'weight': 'light', 'size': 10}
+    # matplotlib.rc('font', **font)
+
+    fig = plt.figure(figsize=(20, 8)) # use (6, 7) for colorbar
+    # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.gridspec.GridSpec.html
+    gs = gridspec.GridSpec(figure=fig, nrows=3, ncols=13, hspace=0.1, wspace=0.7)
+    idx = 0
+    axs = []
+
+    for f in ["01", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60"]:
         plt_config = {
             "folder": f,   # sub-folder, also use as the name of the test case
             "cl_h5": "",   # centerline h5
@@ -80,43 +103,58 @@ if __name__ == "__main__":
         }
         plt_config["cl_h5"] = plt_config["folder"] + ".h5"
         plt_config["contraction_start"] = frame_boundaries[plt_config["folder"]][0]
-        plt_config["contraction_end"] = frame_boundaries[plt_config["folder"]][1]
-        plt_config["expansion_start"] = frame_boundaries[plt_config["folder"]][2]
-        plt_config["expansion_end"] = frame_boundaries[plt_config["folder"]][3]
+        plt_config["contraction_end"] = frame_boundaries[plt_config["folder"]][0] + frame_boundaries[plt_config["folder"]][-1]
+        plt_config["expansion_start"] = frame_boundaries[plt_config["folder"]][1]
+        plt_config["expansion_end"] = frame_boundaries[plt_config["folder"]][1] + frame_boundaries[plt_config["folder"]][-1]
+        plt_config["absolute_start"] = frame_boundaries[plt_config["folder"]][2]
+        plt_config["absolute_end"] = frame_boundaries[plt_config["folder"]][2] + 200
 
         centerline_h5 = os.path.join(data_root, plt_config["folder"], plt_config["cl_h5"])
         G = read_center_line_h5(centerline_h5, gx_ds="gx")
 
-        fig = plt.figure(figsize=(6, 8)) # use (6, 7) for colorbar
-        # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.gridspec.GridSpec.html
-        gs = gridspec.GridSpec(figure=fig, nrows=1, ncols=2)
-
-        plt.title("strain rate: " + get_strain_rate(plt_config["folder"]) + "\n")
-        plt.axis('off')
-
-        axs = []
+        # expansion
+        ax = fig.add_subplot(gs[0, idx])        
+        ax.set_title(get_strain_rate(plt_config["folder"]) + "\n")
+        cs = draw_G(G[:, plt_config["expansion_start"]:plt_config["expansion_end"] + 1], ax)
+        # ax.set_xlabel("position (pixel)")
+        ax.set_xticks([0, 600])
+        ax.set_xticklabels([])
+        if idx == 0:
+            ax.set_ylabel("time (frame)")
+            # ax.text(-500, 1100, "strain rate =", fontsize=12)        
+        if idx == 0:
+            ax.set_yticks([-250, 0, 250, 500, 750])
+            ax.set_yticklabels([0, 250, 500, 750, 1000])
+        else:
+            ax.set_yticks(frame_ticks[plt_config["folder"]])
+        axs.append(ax)
 
         # contraction
-        ax = fig.add_subplot(gs[0, 0])
+        ax = fig.add_subplot(gs[1, idx])
         draw_G(G[:, plt_config["contraction_start"]:plt_config["contraction_end"] + 1], ax)
-        ax.set_xlabel("position (pixel)")
-        ax.set_xticks([0, 200, 400, 600])
-        ax.set_ylabel("time (frame)")    
+        ax.set_xticks([0, 600])
+        ax.set_xticklabels([])
+        if idx == 0:
+            ax.set_ylabel("time (frame)")
         ax.set_yticks(frame_ticks[plt_config["folder"]])
         axs.append(ax)
 
-        # expansion
-        ax = fig.add_subplot(gs[0, 1])
-        cs = draw_G(G[:, plt_config["expansion_start"]:plt_config["expansion_end"] + 1], ax)
-        ax.set_xlabel("position (pixel)")
-        ax.set_xticks([0, 200, 400, 600])
-        ax.set_yticks(frame_ticks[plt_config["folder"]])
-        ax.set_yticklabels([])
+        # absolute time
+        ax = fig.add_subplot(gs[2, idx])
+        draw_G(G[:, plt_config["absolute_start"]:plt_config["absolute_end"] + 1], ax)
+        if idx == 6:
+            ax.set_xlabel("position (pixel)")
+        ax.set_xticks([0, 600])
+        if idx == 0:
+            ax.set_ylabel("time (frame)")
+        ax.set_yticks([0, 50, 100, 150, 200])
         axs.append(ax)
 
-        # cbar = fig.colorbar(cs, ax=axs, shrink=0.5)
-        # cbar.ax.set_xlabel("dz/dx")
+        idx += 1
 
-        img_file = os.path.join(output_img_dir, plt_config["folder"] + ".png")
-        _logger.info("Save image file %s" % img_file)
-        fig.savefig(img_file, bbox_inches='tight', dpi=72) # dpi use 72 for screen, 300 for print
+    cbar = fig.colorbar(cs, ax=axs, shrink=0.4, pad=0.02)
+    cbar.ax.set_xlabel("gradient")
+
+    img_file = os.path.join(output_img_dir, "normalized_time.png")
+    _logger.info("Save image file %s" % img_file)
+    fig.savefig(img_file, bbox_inches='tight', dpi=72) # dpi use 72 for screen, 300 for print

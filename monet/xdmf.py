@@ -21,7 +21,7 @@ def z_file_to_xdmf(z_file, xdmf_dir, filename):
     X = np.arange(0, nx)
     Y = np.arange(0, ny)
 
-    x_2d, y_2d = np.meshgrid(X, Y)
+    x_2d, y_2d = np.meshgrid(Y, X)
 
     x = np.zeros((nx, ny), dtype='float32')
     x[:, :] = x_2d

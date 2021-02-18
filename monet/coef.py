@@ -91,7 +91,7 @@ def build_quadruple_data(i, j, M, N):
 
 @numba.jit(nopython=True)
 def uij(i, j, M, N):
-    return i * M + j
+    return i * N + j
 
 
 @numba.jit(nopython=True)
@@ -110,8 +110,8 @@ if __name__ == "__main__":
 
     data_dir = os.path.join(prj_root, "data")
 
-    M = 1000
-    N = 1000
+    M = 600
+    N = 100
     mat_A = build_A(M, N)
 
     npz_file = os.path.join(data_dir, "A.npz")
