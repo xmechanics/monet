@@ -4,7 +4,7 @@ import h5py
 import numpy as np
 
 
-def z_file_to_xdmf(z_file, xdmf_dir, filename):
+def z_file_to_xdmf(z_file, xdmf_dir, filename, length_scale=1):
     xdmf_file = os.path.join(xdmf_dir, "%s.xmf" % filename)
     h5_file_name = "%s.h5" % filename
     h5_file = os.path.join(xdmf_dir, h5_file_name)
@@ -24,11 +24,11 @@ def z_file_to_xdmf(z_file, xdmf_dir, filename):
     x_2d, y_2d = np.meshgrid(Y, X)
 
     x = np.zeros((nx, ny), dtype='float32')
-    x[:, :] = x_2d
+    x[:, :] = x_2d * length_scale
     y = np.zeros((nx, ny), dtype='float32')
-    y[:, :] = y_2d
+    y[:, :] = y_2d * length_scale
     z = np.zeros((nx, ny), dtype='float32')
-    z[:, :] = z_data
+    z[:, :] = z_data * length_scale
     gx = np.zeros((nx, ny), dtype='float32')
     gx[:, :] = gx_data
     gy = np.zeros((nx, ny), dtype='float32')
