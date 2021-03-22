@@ -33,7 +33,7 @@ def meshing(G):
 def draw_G(G, ax):
     X, Y, Z = meshing(G)
     # levels = MaxNLocator(nbins=20).tick_values(Z.min(), Z.max())
-    levels = np.arange(-0.13, 0.14, 0.01)
+    levels = np.arange(-0.25, 0.26, 0.01)
     cmap = plt.get_cmap('RdBu')
     return ax.contourf(X, Y, G.T, levels=levels, cmap=cmap)
 
@@ -89,13 +89,15 @@ if __name__ == "__main__":
     # font = {'weight': 'light', 'size': 10}
     # matplotlib.rc('font', **font)
 
-    fig = plt.figure(figsize=(20, 8)) # use (6, 7) for colorbar
+    rates = ["01", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50"]
+
+    fig = plt.figure(figsize=(20, 5)) # use (6, 7) for colorbar
     # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.gridspec.GridSpec.html
-    gs = gridspec.GridSpec(figure=fig, nrows=3, ncols=13, hspace=0.1, wspace=0.7)
+    gs = gridspec.GridSpec(figure=fig, nrows=2, ncols=len(rates), hspace=0.1, wspace=0.45)
     idx = 0
     axs = []
 
-    for f in ["01", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60"]:
+    for f in rates:
         plt_config = {
             "folder": f,   # sub-folder, also use as the name of the test case
             "cl_h5": "",   # centerline h5
@@ -110,7 +112,8 @@ if __name__ == "__main__":
         plt_config["absolute_end"] = frame_boundaries[plt_config["folder"]][2] + 200
 
         centerline_h5 = os.path.join(data_root, plt_config["folder"], plt_config["cl_h5"])
-        G = read_center_line_h5(centerline_h5, gx_ds="gx")
+        G = read_center_line_h5(centerline_h5, gx_ds="gx") * 2.
+        print(G.max(), G.min())
 
         # expansion
         ax = fig.add_subplot(gs[0, idx])        
@@ -120,7 +123,7 @@ if __name__ == "__main__":
         ax.set_xticks([0, 600])
         ax.set_xticklabels([])
         if idx == 0:
-            ax.set_ylabel("time (frame)")
+            ax.set_ylabel("time (frame)", fontsize=12)
             # ax.text(-500, 1100, "strain rate =", fontsize=12)        
         if idx == 0:
             ax.set_yticks([-250, 0, 250, 500, 750])
@@ -133,28 +136,32 @@ if __name__ == "__main__":
         ax = fig.add_subplot(gs[1, idx])
         draw_G(G[:, plt_config["contraction_start"]:plt_config["contraction_end"] + 1], ax)
         ax.set_xticks([0, 600])
-        ax.set_xticklabels([])
+        ax.set_xticklabels([0, 195])
+        if idx == 5:
+            # ax.text(500, -13, r"$x_2$ ($\mu$m)", fontsize=12)
+            ax.set_xlabel(r"$x_2$ ($\mu$m)", fontsize=12)
         if idx == 0:
-            ax.set_ylabel("time (frame)")
+            ax.set_ylabel("time (frame)", fontsize=12)
         ax.set_yticks(frame_ticks[plt_config["folder"]])
         axs.append(ax)
 
-        # absolute time
-        ax = fig.add_subplot(gs[2, idx])
-        draw_G(G[:, plt_config["absolute_start"]:plt_config["absolute_end"] + 1], ax)
-        if idx == 6:
-            ax.set_xlabel("position (pixel)")
-        ax.set_xticks([0, 600])
-        if idx == 0:
-            ax.set_ylabel("time (frame)")
-        ax.set_yticks([0, 50, 100, 150, 200])
-        axs.append(ax)
+        # # absolute time
+        # ax = fig.add_subplot(gs[2, idx])
+        # draw_G(G[:, plt_config["absolute_start"]:plt_config["absolute_end"] + 1], ax)
+        # if idx == 6:
+        #     ax.set_xlabel(r"$x_2$ ($\mu$m)")
+        # ax.set_xticks([0, 600])
+        # ax.set_xticklabels([0, 195])
+        # if idx == 0:
+        #     ax.set_ylabel("time (frame)")
+        # ax.set_yticks([0, 50, 100, 150, 200])
+        # axs.append(ax)
 
         idx += 1
 
-    cbar = fig.colorbar(cs, ax=axs, shrink=0.4, pad=0.02)
-    cbar.ax.set_xlabel("gradient")
+    cbar = fig.colorbar(cs, ax=axs, shrink=0.6, pad=0.02)
+    cbar.ax.set_xlabel(r"$\partial x_3$/$\partial x_2$", fontsize=12)
 
     img_file = os.path.join(output_img_dir, "normalized_time.png")
     _logger.info("Save image file %s" % img_file)
-    fig.savefig(img_file, bbox_inches='tight', dpi=72) # dpi use 72 for screen, 300 for print
+    fig.savefig(img_file, bbox_inches='tight', dpi=300) # dpi use 72 for screen, 300 for print

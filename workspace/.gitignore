@@ -2,6 +2,7 @@
 
 !template.py
 !evolution_template.py
+!evolution_template_3d.py
 
 /data
 /output

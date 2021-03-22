@@ -31,7 +31,7 @@ Each `.h5` file has two data sets `gradz_x` and `gradz_y`.
 Clone `template.py` as your own script. Modify it to run your job.
 
 
-    ffmpeg -framerate 23 -i img/microribbon-%04d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p microribbon.mp4
+    ffmpeg -framerate 100 -i microribbon1/microribbon-%04d.png -c:v libx264 -profile:v high -crf 20 -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" microribbon1.mp4
 
 ### centerline evolution
 
